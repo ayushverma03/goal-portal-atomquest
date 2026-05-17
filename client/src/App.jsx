@@ -1,9 +1,9 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
+import LoginPage from './pages/LoginPage';
+import GoalList from './pages/employee/GoalList';
 
-// Placeholder Components (We will build these in next steps)
-const Login = () => <div className="p-10 text-center">Login Page (Building Next)</div>;
 const DashboardSelector = () => {
   const { user } = useAuth();
   if (user.role === 'admin') return <Navigate to="/admin" />;
@@ -16,31 +16,48 @@ function App() {
     <AuthProvider>
       <BrowserRouter>
         <Routes>
-          <Route path="/login" element={<Login />} />
+          {/* Public Routes */}
+          <Route path="/login" element={<LoginPage />} />
           
+          {/* Root Redirector */}
           <Route path="/" element={
             <ProtectedRoute>
               <DashboardSelector />
             </ProtectedRoute>
           } />
 
+          {/* Employee Routes */}
           <Route path="/employee/*" element={
             <ProtectedRoute allowedRoles={['employee']}>
-              <div className="p-10">Employee Dashboard Shell</div>
+              <Routes>
+                <Route path="/" element={<GoalList />} />
+                {/* We will add /create and /edit here in Step 9 */}
+              </Routes>
             </ProtectedRoute>
           } />
 
+          {/* Manager Routes */}
           <Route path="/manager/*" element={
             <ProtectedRoute allowedRoles={['manager']}>
-              <div className="p-10">Manager Dashboard Shell</div>
+              <div className="p-10">
+                <h1 className="text-2xl font-bold">Manager Dashboard</h1>
+                <p>Manager content coming in next step...</p>
+              </div>
             </ProtectedRoute>
           } />
 
+          {/* Admin Routes */}
           <Route path="/admin/*" element={
             <ProtectedRoute allowedRoles={['admin']}>
-              <div className="p-10">Admin Dashboard Shell</div>
+              <div className="p-10">
+                <h1 className="text-2xl font-bold">Admin Dashboard</h1>
+                <p>Admin content coming in next step...</p>
+              </div>
             </ProtectedRoute>
           } />
+
+          {/* Fallback */}
+          <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>
