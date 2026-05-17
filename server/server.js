@@ -8,6 +8,8 @@ import 'express-async-errors'; // Handles async errors automatically
 import { errorHandler } from './middleware/errorMiddleware.js';
 import authRoutes from './routes/authRoutes.js';
 import goalRoutes from './routes/goalRoutes.js';
+import achievementRoutes from './routes/achievementRoutes.js';
+import checkinRoutes from './routes/checkinRoutes.js';
 
 dotenv.config();
 
@@ -28,9 +30,15 @@ app.get('/api/health', (req, res) => {
   });
 });
 
+
+
 app.use(errorHandler);
 app.use('/api/auth', authRoutes);
 app.use('/api/goals', goalRoutes);
+app.use('/api/achievements', achievementRoutes);
+app.use('/api/checkins', checkinRoutes)
+
+
 
 const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI;
