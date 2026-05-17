@@ -10,6 +10,8 @@ import authRoutes from './routes/authRoutes.js';
 import goalRoutes from './routes/goalRoutes.js';
 import achievementRoutes from './routes/achievementRoutes.js';
 import checkinRoutes from './routes/checkinRoutes.js';
+import reportRoutes from './routes/reportRoutes.js';
+import adminRoutes from './routes/adminRoutes.js';
 
 dotenv.config();
 
@@ -36,8 +38,9 @@ app.use(errorHandler);
 app.use('/api/auth', authRoutes);
 app.use('/api/goals', goalRoutes);
 app.use('/api/achievements', achievementRoutes);
-app.use('/api/checkins', checkinRoutes)
-
+app.use('/api/checkins', checkinRoutes);
+app.use('/api/reports', reportRoutes);
+app.use('/api/admin', adminRoutes);
 
 
 const PORT = process.env.PORT || 5000;
