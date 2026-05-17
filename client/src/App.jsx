@@ -3,6 +3,8 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import LoginPage from './pages/LoginPage';
 import GoalList from './pages/employee/GoalList';
+import CreateGoal from './pages/employee/CreateGoal';
+import TeamGoals from './pages/manager/TeamGoals';
 
 const DashboardSelector = () => {
   const { user } = useAuth();
@@ -16,6 +18,7 @@ function App() {
     <AuthProvider>
       <BrowserRouter>
         <Routes>
+
           {/* Public Routes */}
           <Route path="/login" element={<LoginPage />} />
           
@@ -31,7 +34,7 @@ function App() {
             <ProtectedRoute allowedRoles={['employee']}>
               <Routes>
                 <Route path="/" element={<GoalList />} />
-                {/* We will add /create and /edit here in Step 9 */}
+                <Route path="/create" element={<CreateGoal />} />
               </Routes>
             </ProtectedRoute>
           } />
@@ -39,10 +42,9 @@ function App() {
           {/* Manager Routes */}
           <Route path="/manager/*" element={
             <ProtectedRoute allowedRoles={['manager']}>
-              <div className="p-10">
-                <h1 className="text-2xl font-bold">Manager Dashboard</h1>
-                <p>Manager content coming in next step...</p>
-              </div>
+              <Routes>
+                <Route path="/" element={<TeamGoals />} />
+              </Routes>
             </ProtectedRoute>
           } />
 
