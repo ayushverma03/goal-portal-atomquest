@@ -5,6 +5,8 @@ import LoginPage from './pages/LoginPage';
 import GoalList from './pages/employee/GoalList';
 import CreateGoal from './pages/employee/CreateGoal';
 import TeamGoals from './pages/manager/TeamGoals';
+import LogAchievement from './pages/employee/LogAchievement';
+import AdminDashboard from './pages/admin/AdminDashboard';
 
 const DashboardSelector = () => {
   const { user } = useAuth();
@@ -35,6 +37,7 @@ function App() {
               <Routes>
                 <Route path="/" element={<GoalList />} />
                 <Route path="/create" element={<CreateGoal />} />
+                <Route path="/log" element={<LogAchievement />} />
               </Routes>
             </ProtectedRoute>
           } />
@@ -49,12 +52,11 @@ function App() {
           } />
 
           {/* Admin Routes */}
-          <Route path="/admin/*" element={
+         <Route path="/admin/*" element={
             <ProtectedRoute allowedRoles={['admin']}>
-              <div className="p-10">
-                <h1 className="text-2xl font-bold">Admin Dashboard</h1>
-                <p>Admin content coming in next step...</p>
-              </div>
+              <Routes>
+                <Route path="/" element={<AdminDashboard />} />
+              </Routes>
             </ProtectedRoute>
           } />
 
