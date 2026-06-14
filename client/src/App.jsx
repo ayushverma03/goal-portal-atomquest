@@ -7,6 +7,7 @@ import CreateGoal from './pages/employee/CreateGoal';
 import TeamGoals from './pages/manager/TeamGoals';
 import LogAchievement from './pages/employee/LogAchievement';
 import AdminDashboard from './pages/admin/AdminDashboard';
+import Navbar from './components/Navbar'; 
 
 const DashboardSelector = () => {
   const { user } = useAuth();
@@ -20,7 +21,6 @@ function App() {
     <AuthProvider>
       <BrowserRouter>
         <Routes>
-
           {/* Public Routes */}
           <Route path="/login" element={<LoginPage />} />
           
@@ -34,29 +34,38 @@ function App() {
           {/* Employee Routes */}
           <Route path="/employee/*" element={
             <ProtectedRoute allowedRoles={['employee']}>
-              <Routes>
-                <Route path="/" element={<GoalList />} />
-                <Route path="/create" element={<CreateGoal />} />
-                <Route path="/log" element={<LogAchievement />} />
-              </Routes>
+              <>
+                <Navbar />
+                <Routes>
+                  <Route path="/" element={<GoalList />} />
+                  <Route path="/create" element={<CreateGoal />} />
+                  <Route path="/log" element={<LogAchievement />} />
+                </Routes>
+              </>
             </ProtectedRoute>
           } />
 
           {/* Manager Routes */}
           <Route path="/manager/*" element={
             <ProtectedRoute allowedRoles={['manager']}>
-              <Routes>
-                <Route path="/" element={<TeamGoals />} />
-              </Routes>
+              <>
+                <Navbar />
+                <Routes>
+                  <Route path="/" element={<TeamGoals />} />
+                </Routes>
+              </>
             </ProtectedRoute>
           } />
 
           {/* Admin Routes */}
-         <Route path="/admin/*" element={
+          <Route path="/admin/*" element={
             <ProtectedRoute allowedRoles={['admin']}>
-              <Routes>
-                <Route path="/" element={<AdminDashboard />} />
-              </Routes>
+              <>
+                <Navbar />
+                <Routes>
+                  <Route path="/" element={<AdminDashboard />} />
+                </Routes>
+              </>
             </ProtectedRoute>
           } />
 
