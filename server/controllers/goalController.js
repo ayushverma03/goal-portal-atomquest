@@ -80,3 +80,21 @@ export const returnGoal = async (req, res) => {
   await logAudit(goal._id, req.user, 'RETURN', oldState, goal);
   res.status(200).json({ success: true, message: 'Goal returned for rework' });
 };
+
+export const getTeamGoals = async (req, res) => {
+  try {
+    // 1. Find all users who report to this specific manager
+    const teamMembers = await User.find({ managerId: req.user._id }).select('_id');
+    const teamIds = teamMembers.map(member => member._id);
+
+    // 2. Find all goals belonging to those users that are ready for management review
+    const goals = await Goal.find({
+      employeeId: { $in: teamIds },
+      status: { $in: ['submitted', 'approved', 'returned'] }
+    }).populate('employeeId', 'name email department'); // Enriches the response with worker names
+
+    res.status(200).json({ success: true, count: goals.length, data: goals });
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Server error retrieving team data', error: err.message });
+  }
+};
