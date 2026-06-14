@@ -10,8 +10,27 @@ const TeamGoals = () => {
   };
 
   const handleAction = async (id, action) => {
+    let commentPayload = '';
+
+    if (action === 'return') {
+      const managerComment = prompt("Please provide feedback or a reason for returning this goal for rework:");
+      
+      if (managerComment === null) return;
+
+      if (!managerComment.trim()) {
+        alert("Action aborted: A feedback comment is strictly required to return goals[cite: 1].");
+        return;
+      }
+      commentPayload = managerComment;
+    } else if (action === 'approve') {
+      // Optional comment for approvals
+      commentPayload = 'Approved by manager';
+    }
+
     try {
-      await axios.put(`http://localhost:5000/api/goals/${id}/${action}`);
+      await axios.put(`http://localhost:5000/api/goals/${id}/${action}`, {
+        comment: commentPayload
+      });
       fetchTeamGoals();
     } catch (err) {
       alert("Action failed");
@@ -37,7 +56,7 @@ const TeamGoals = () => {
           <tbody>
             {goals.map(goal => (
               <tr key={goal._id} className="border-b hover:bg-gray-50">
-                <td className="p-4">{goal.employeeId.name}</td>
+                <td className="p-4">{goal.employeeId?.name || 'N/A'}</td>
                 <td className="p-4">{goal.title}</td>
                 <td className="p-4 font-bold">{goal.weightage}%</td>
                 <td className="p-4">
@@ -48,8 +67,8 @@ const TeamGoals = () => {
                 <td className="p-4 space-x-2">
                   {goal.status === 'submitted' && (
                     <>
-                      <button onClick={() => handleAction(goal._id, 'approve')} className="bg-green-600 text-white px-3 py-1 rounded text-sm">Approve</button>
-                      <button onClick={() => handleAction(goal._id, 'return')} className="bg-red-600 text-white px-3 py-1 rounded text-sm">Return</button>
+                      <button onClick={() => handleAction(goal._id, 'approve')} className="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700 transition">Approve</button>
+                      <button onClick={() => handleAction(goal._id, 'return')} className="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700 transition">Return</button>
                     </>
                   )}
                 </td>
