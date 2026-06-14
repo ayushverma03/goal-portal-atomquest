@@ -1,55 +1,467 @@
-# GoalPortal - Enterprise Goal Setting & Performance Tracking Platform
+# GoalPortal – Enterprise Goal Setting & Performance Tracking Platform
 
-GoalPortal is a full-stack, high-fidelity MERN application designed to digitize and automate the end-to-end lifecycle of organizational goal setting, quarterly check-ins, and performance evaluation[cite: 1]. The platform eliminates fragmented tracking methods like spreadsheets and email chains by introducing automated governance, role-based workflows, and real-time analytical data aggregation[cite: 1].
+GoalPortal is a full-stack MERN application designed to digitize and automate the complete lifecycle of organizational goal setting, quarterly check-ins, performance monitoring, and evaluation workflows.
+
+The platform replaces spreadsheet-based tracking and email-driven approval processes with a centralized, role-based system that enforces governance rules, automates approvals, tracks progress, and provides real-time organizational analytics.
 
 ---
 
-## 🚀 Key Features & System Capabilities
+## 🚀 Features
 
-### 1. Multi-Tier Role-Based Access Control (RBAC)
-The portal supports three distinct user personas, each with strictly segregated access levels and administrative capabilities[cite: 1]:
-*   **Employee:** Draft, edit, and submit quarterly Goal Sheets; track locked objectives and update operational progress[cite: 1].
-*   **Manager (L1):** Access a team dashboard to inline-review, edit, approve, or return goal sheets for rework with structured feedback loops[cite: 1].
-*   **Admin / HR:** Configure company evaluation cycles, enforce corporate time-windows, monitor organizational compliance, and manage system audit exceptions[cite: 1].
+### Multi-Tier Role-Based Access Control (RBAC)
 
-### 2. Automated Business Rule Governance (Phase 1)
-Built-in backend schema guardrails strictly enforce corporate compliance parameters during goal creation[cite: 1]:
-*   **Total Weightage Validation:** Enforces that the total weightage across an employee's goal sheet must equal exactly 100%[cite: 1].
-*   **Granular Minimum Boundaries:** Enforces a minimum weightage boundary of 10% per individual goal to prevent trivial entry diluting[cite: 1].
-*   **Resource Caps:** Imposes a strict maximum limit of 8 goals per employee profile[cite: 1].
-*   **State Locking:** Upon manager approval, goal sheets are instantly locked down to prevent post-facto structural tampering without admin intervention[cite: 1].
+GoalPortal supports three distinct user roles with strictly controlled permissions.
 
-### 3. Mathematical Metrics Engine & Time-Window Enforcement (Phase 2)
-*   **Dynamic Active Windows:** Automated checking mechanisms match system timelines against database-configured dates (`windowOpen` to `windowClose`) to lock or unlock active quarterly check-in capturing[cite: 1].
-*   **Multi-Conditional Scoring Formulas:** Automatically computes real-time achievement progress scores based on the specific Unit of Measurement (UoM) configured for the goal[cite: 1]:
-    *   *Numeric/Percentage Min (Higher is Better):* $\text{Achievement} \div \text{Target}$[cite: 1]
-    *   *Numeric/Percentage Max (Lower is Better):* $\text{Target} \div \text{Achievement}$[cite: 1]
-    *   *Timeline (Date-Based):* Measures completion date against deadline milestones[cite: 1].
-    *   *Zero-Based (Zero = Success):* Returns 100% if actual entry is 0, else returns 0%[cite: 1].
+#### Employee
 
-### 4. Reporting, Governance & Analytics
-*   **Compliance Export Interface:** Generates and streams down real-time organization-wide data into exportable CSV formats showing Planned Targets vs. Actual Achievements for HR processing[cite: 1].
-*   **Live Performance Dashboards:** Aggregates database values into visual charts using Recharts, presenting real-time goal achievement trends and distributions[cite: 1].
-*   **Transactional Audit Trails:** Tracks critical structural state changes post-approval, logging precise cryptographic stamps detailing who changed what data and exactly when[cite: 1].
+* Create and manage quarterly goal sheets
+* Draft, edit, and submit goals
+* Track approved objectives
+* Update achievement progress during active review periods
+* View personal performance metrics
+
+#### Manager (L1)
+
+* Review employee goal sheets
+* Approve or reject submissions
+* Provide structured feedback
+* Edit submitted goals when required
+* Monitor team-wide performance through dashboards
+
+#### Admin / HR
+
+* Configure organizational review cycles
+* Define active evaluation windows
+* Manage users and hierarchy
+* Monitor compliance across departments
+* Override locked records when necessary
+* Access organization-wide reports and analytics
+
+---
+
+## 📋 Business Rule Governance
+
+The platform enforces multiple organizational constraints directly through backend validation.
+
+### Goal Weightage Validation
+
+* Total weightage across all goals must equal exactly **100%**
+
+### Minimum Goal Weightage
+
+* Each goal must carry at least **10% weightage**
+
+### Maximum Goal Limit
+
+* Employees can create a maximum of **8 goals**
+
+### Goal Sheet Locking
+
+* Once approved by a manager, goal sheets become locked
+* Structural modifications require administrative intervention
+
+---
+
+## 📊 Performance Tracking & Metrics Engine
+
+### Dynamic Evaluation Windows
+
+Administrators can define review periods using configurable date ranges.
+
+```javascript
+windowOpen
+windowClose
+```
+
+The system automatically determines whether progress updates are allowed based on the active evaluation window.
+
+---
+
+### Achievement Calculation Logic
+
+GoalPortal automatically calculates achievement percentages according to the selected Unit of Measurement (UoM).
+
+#### Numeric / Percentage (Higher is Better)
+
+Achievement % = Actual ÷ Target × 100
+
+Example:
+
+Target: 100
+Actual: 80
+
+Achievement = 80%
+
+---
+
+#### Numeric / Percentage (Lower is Better)
+
+Achievement % = Target ÷ Actual × 100
+
+Example:
+
+Target: 10 defects
+Actual: 5 defects
+
+Achievement = 200%
+
+---
+
+#### Timeline-Based Goals
+
+Measures completion date against planned deadlines and milestone targets.
+
+---
+
+#### Zero-Based Goals
+
+Used for metrics where zero represents success.
+
+Example:
+
+* Security incidents
+* Production outages
+* Escalations
+
+Logic:
+
+```text
+Actual = 0 → 100%
+Actual > 0 → 0%
+```
+
+---
+
+## 📈 Reporting & Analytics
+
+### Compliance Export Interface
+
+Generate organization-wide CSV reports containing:
+
+* Employee details
+* Goal information
+* Planned targets
+* Actual achievements
+* Achievement percentages
+* Approval status
+
+---
+
+### Performance Dashboards
+
+Interactive dashboards provide:
+
+* Goal completion trends
+* Department performance distribution
+* Achievement breakdowns
+* Progress tracking charts
+
+Built using Recharts for real-time visualization.
+
+---
+
+### Audit Trail Logging
+
+All critical actions are tracked and stored.
+
+Examples:
+
+* Goal approval
+* Goal rejection
+* Administrative overrides
+* Locked-sheet modifications
+* Performance updates
+
+Audit logs record:
+
+* User ID
+* Action performed
+* Timestamp
+* Previous value
+* Updated value
+
+---
+
+## 🏗️ System Architecture
+
+```text
+┌────────────────┐
+│ React Frontend │
+└──────┬─────────┘
+       │
+       ▼
+┌─────────────┐
+│ Express API │
+└──────┬──────┘
+       │
+       ▼
+┌───────────────┐
+│ MongoDB Atlas │
+└───────────────┘
+```
+
+Authentication is handled using JWT tokens, while MongoDB stores organizational data, goals, reviews, and audit records.
 
 ---
 
 ## 🛠️ Technology Stack
 
-*   **Frontend:** React.js, Vite, Tailwind CSS, Recharts, Axios, React Router DOM
-*   **Backend:** Node.js, Express.js, JSON Web Tokens (JWT), Mongoose ODM
-*   **Database:** MongoDB Atlas (Cloud-hosted NoSQL)
-*   **Environment Management:** Dotenv
+### Frontend
+
+* React.js
+* Vite
+* Tailwind CSS
+* React Router DOM
+* Axios
+* Recharts
+
+### Backend
+
+* Node.js
+* Express.js
+* JWT Authentication
+* Mongoose ODM
+
+### Database
+
+* MongoDB Atlas
+
+### Environment Management
+
+* Dotenv
 
 ---
 
-## ⚙️ Installation & Local Setup
+## 📂 Project Structure
 
-### Prerequisites
-*   Node.js (v18+ recommended)
-*   MongoDB Atlas connection string
+```text
+goal-portal/
+│
+├── client/
+│   ├── src/
+│   ├── public/
+│   └── package.json
+│
+├── server/
+│   ├── controllers/
+│   ├── routes/
+│   ├── middleware/
+│   ├── models/
+│   ├── utils/
+│   ├── seed.js
+│   └── package.json
+│
+├── README.md
+└── package.json
+```
 
-### 1. Clone the Repository
+---
+
+# ⚙️ Local Setup
+
+## Prerequisites
+
+Before starting, ensure the following are installed:
+
+* Node.js v18+
+* npm
+* MongoDB Atlas account
+
+---
+
+## 1. Clone Repository
+
 ```bash
-git clone [https://github.com/ayushverma03/goal-portal-atomquest.git](https://github.com/ayushverma03/goal-portal-atomquest.git)
+git clone https://github.com/ayushverma03/goal-portal-atomquest.git
+
 cd goal-portal-atomquest
+```
+
+---
+
+## 2. Configure Environment Variables
+
+Create a `.env` file inside the `server` directory.
+
+```env
+PORT=5000
+
+MONGO_URI=your_mongodb_atlas_connection_string
+
+JWT_SECRET=your_jwt_secret_key
+```
+
+---
+
+## 3. Install Dependencies
+
+### Backend
+
+```bash
+cd server
+
+npm install
+```
+
+### Frontend
+
+```bash
+cd ../client
+
+npm install
+```
+
+---
+
+## 4. Seed Initial Data
+
+Populate the database with:
+
+* Default roles
+* Organizational hierarchy
+* Sample users
+* Active evaluation windows
+
+```bash
+cd ..
+
+node server/seed.js
+```
+
+---
+
+## 5. Start Development Servers
+
+### Backend
+
+```bash
+cd server
+
+npm run dev
+```
+
+Server runs at:
+
+```text
+http://localhost:5000
+```
+
+---
+
+### Frontend
+
+```bash
+cd client
+
+npm run dev
+```
+
+Frontend runs at:
+
+```text
+http://localhost:5173
+```
+
+---
+
+## 🔐 Authentication Flow
+
+```text
+User Login
+     │
+     ▼
+JWT Token Generated
+     │
+     ▼
+Token Stored Client-Side
+     │
+     ▼
+Protected API Requests
+     │
+     ▼
+Role-Based Authorization
+```
+
+---
+
+## 🎯 Sample Workflow
+
+### Employee
+
+1. Create quarterly goals
+2. Assign weightages
+3. Submit for review
+
+### Manager
+
+1. Review submission
+2. Approve or reject
+3. Provide feedback
+
+### Employee
+
+1. Update achievements during active cycle
+2. Submit progress
+
+### Admin / HR
+
+1. Monitor compliance
+2. Generate reports
+3. Analyze organization-wide performance
+
+---
+
+## 🚧 Future Enhancements
+
+* Email notifications
+* Multi-level approvals (L2/L3)
+* Goal templates
+* OKR support
+* PDF report generation
+* SSO Integration
+* Department-wise benchmarking
+* AI-driven performance insights
+* Slack / Microsoft Teams integration
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome.
+
+1. Fork the repository
+2. Create a feature branch
+
+```bash
+git checkout -b feature/new-feature
+```
+
+3. Commit changes
+
+```bash
+git commit -m "Add new feature"
+```
+
+4. Push branch
+
+```bash
+git push origin feature/new-feature
+```
+
+5. Create a Pull Request
+
+---
+
+## 📄 License
+
+This project is developed for educational and enterprise workflow automation purposes.
+
+---
+
+## 👨‍💻 Author
+
+**Ayush Verma**
+
+---
+
+### Built with MERN Stack • JWT Authentication • MongoDB Atlas • Enterprise Workflow Automation
