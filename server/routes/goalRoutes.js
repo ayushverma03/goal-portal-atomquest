@@ -5,7 +5,8 @@ import {
   submitGoalSheet, 
   approveGoal, 
   returnGoal,
-  getTeamGoals 
+  getTeamGoals,
+  exportAchievementReport
 } from '../controllers/goalController.js';
 import { protect, authorize } from '../middleware/authMiddleware.js';
 
@@ -22,4 +23,5 @@ router.get('/team', authorize('manager'), getTeamGoals);
 router.put('/:id/approve', authorize('manager'), approveGoal);
 router.put('/:id/return', authorize('manager'), returnGoal);
 
+router.get('/export-report', authorize('admin'), exportAchievementReport);
 export default router;

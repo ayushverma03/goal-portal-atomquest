@@ -9,16 +9,14 @@ import Achievement from './models/Achievement.js';
 import Checkin from './models/Checkin.js';
 import AuditLog from './models/AuditLog.js';
 
-dotenv.config();
+dotenv.config({ path: './server/.env' });
 
 const seedDatabase = async () => {
   try {
-    // 1. Connect to Database using current environmental setup
     console.log('⏳ Connecting to database for seeding data...');
     await mongoose.connect(process.env.MONGO_URI);
     console.log('✅ Connected safely to database.');
 
-    // 2. Wipe existing data to ensure a clean slate
     console.log('🧹 Purging older collections...');
     await User.deleteMany();
     await Cycle.deleteMany();
@@ -27,13 +25,11 @@ const seedDatabase = async () => {
     await Checkin.deleteMany();
     await AuditLog.deleteMany();
 
-    // 3. Create generic passwords using standard hashes
     const salt = await bcrypt.genSalt(10);
     const standardHashedPassword = await bcrypt.hash('Demo@1234', salt);
 
     console.log('👤 Seeding user roles and administrative trees...');
 
-    // 4. Insert Admin Account
     const adminUser = await User.create({
       name: 'System Administrator',
       email: 'admin@demo.com',
@@ -42,7 +38,7 @@ const seedDatabase = async () => {
       department: 'Human Resources',
     });
 
-    // 5. Insert Manager Account (reports to no one or admin)
+    
     const managerUser = await User.create({
       name: 'Sarah Jenkins',
       email: 'manager@demo.com',
@@ -52,7 +48,7 @@ const seedDatabase = async () => {
       department: 'Engineering',
     });
 
-    // 6. Insert Employee Accounts reporting directly to Sarah (managerUser)
+  
     const employeeOne = await User.create({
       name: 'Alex Rivera',
       email: 'employee@demo.com',
@@ -73,14 +69,16 @@ const seedDatabase = async () => {
 
     console.log('📅 Seeding baseline evaluation performance cycle...');
 
-    // 7. Establish an active goal setting window
+   
     const openDate = new Date();
+    openDate.setDate(openDate.getDate() - 5); // Window opened 5 days ago
+
     const closeDate = new Date();
-    closeDate.setDate(openDate.getDate() + 30); // open window for 30 days
+    closeDate.setDate(closeDate.getDate() + 25); // Window closes in 25 days
 
     await Cycle.create({
       name: 'FY 2026 Annual Strategy Cycle',
-      phase: 'GoalSetting',
+      phase: 'Q1', // Set to Q1 to pass achievement logging gate check-ins
       windowOpen: openDate,
       windowClose: closeDate,
       isActive: true,
@@ -91,9 +89,9 @@ const seedDatabase = async () => {
     console.log('======================================================');
     console.log('🔑 Use the following credentials to access the system:');
     console.log('   All profiles share the password: Demo@1234\n');
-    console.log(`   👉 Admin:    ${adminUser.email}`);
-    console.log(`   👉 Manager:  ${managerUser.email}`);
-    console.log(`   👉 Employee: ${employeeOne.email}`);
+    console.log(`   👉 Admin:     ${adminUser.email}`);
+    console.log(`   👉 Manager:   ${managerUser.email}`);
+    console.log(`   👉 Employee:  ${employeeOne.email}`);
     console.log(`   👉 Employee 2: ${employeeTwo.email}`);
     console.log('======================================================\n');
 

@@ -2,13 +2,14 @@ import jwt from 'jsonwebtoken';
 import { CustomError } from './errorMiddleware.js';
 import User from '../models/User.js';
 
-// Middleware to protect routes and verify JWT tokens
 export const protect = async (req, res, next) => {
   let token;
 
-  // Read token from the Authorization header (Format: Bearer <token>)
   if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
     token = req.headers.authorization.split(' ')[1];
+  } 
+  else if (req.query && req.query.token) {
+    token = req.query.token;
   }
 
   if (!token) {

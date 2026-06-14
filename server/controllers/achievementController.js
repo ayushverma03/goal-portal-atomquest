@@ -25,28 +25,36 @@ const calculateScore = (uom, target, actual) => {
 };
 
 export const logAchievement = async (req, res) => {
-  const { goalId, quarter, actualValue, status } = req.body;
+  const { goalId, actualValue, status } = req.body;
 
   const activeCycle = await Cycle.findOne({ isActive: true });
-  if (!activeCycle) throw new CustomError('No active cycle', 404);
+  if (!activeCycle) throw new CustomError('No active performance cycle found', 404);
+
+  if (activeCycle.phase === 'GoalSetting') {
+    throw new CustomError('Submission blocked: Achievement tracking has not opened for this cycle yet.', 400);
+  }
 
   const now = new Date();
   if (now < activeCycle.windowOpen || now > activeCycle.windowClose) {
-    throw new CustomError('Check-in window is currently closed', 403);
+    throw new CustomError(`The check-in window for ${activeCycle.phase} is currently closed.`, 403);
   }
 
   const goal = await Goal.findById(goalId);
-  if (!goal) throw new CustomError('Goal not found', 404);
+  if (!goal) throw new CustomError('Goal record not found', 404);
+  if (goal.status !== 'approved') {
+    throw new CustomError('Action denied: Progress tracking is restricted to approved goals only.', 400);
+  }
 
   const computedScore = calculateScore(goal.uom, goal.target, actualValue);
 
+
   const achievement = await Achievement.findOneAndUpdate(
-    { goalId, quarter },
-    { actualValue, status, computedScore },
+    { goalId, quarter: activeCycle.phase },
+    { employeeId: req.user._id, actualValue, status, computedScore },
     { upsert: true, new: true, runValidators: true }
   );
 
-  res.status(200).json({ success: true, data: achievement });
+  res.status(200).json({ success: true, message: `Progress logged for ${activeCycle.phase}!`, data: achievement });
 };
 
 export const getGoalAchievements = async (req, res) => {

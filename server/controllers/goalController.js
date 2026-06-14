@@ -97,18 +97,49 @@ export const returnGoal = async (req, res) => {
 
 export const getTeamGoals = async (req, res) => {
   try {
-    // 1. Find all users who report to this specific manager
     const teamMembers = await User.find({ managerId: req.user._id }).select('_id');
     const teamIds = teamMembers.map(member => member._id);
 
-    // 2. Find all goals belonging to those users that are ready for management review
     const goals = await Goal.find({
       employeeId: { $in: teamIds },
       status: { $in: ['submitted', 'approved', 'returned'] }
-    }).populate('employeeId', 'name email department'); // Enriches the response with worker names
+    }).populate('employeeId', 'name email department'); 
 
     res.status(200).json({ success: true, count: goals.length, data: goals });
   } catch (err) {
     res.status(500).json({ success: false, message: 'Server error retrieving team data', error: err.message });
+  }
+};
+
+
+
+export const exportAchievementReport = async (req, res) => {
+  try {
+    // Fetch all goals across the organization and populate employee info
+    const goals = await Goal.find()
+      .populate('employeeId', 'name email department')
+      .lean();
+
+
+    let csvContent = 'Employee Name,Employee Email,Department,Thrust Area,Goal Title,UoM,Target,Status,Weightage\n';
+
+   
+    goals.forEach(goal => {
+      const empName = goal.employeeId?.name || 'N/A';
+      const empEmail = goal.employeeId?.email || 'N/A';
+      const dept = goal.employeeId?.department || 'N/A';
+      const thrust = goal.thrustArea || 'N/A';
+      const title = goal.title.replace(/,/g, ' '); // remove commas
+      
+      csvContent += `"${empName}","${empEmail}","${dept}","${thrust}","${title}","${goal.uom}",${goal.target},"${goal.status}",${goal.weightage}%\n`;
+    });
+
+    // download headers
+    res.setHeader('Content-Type', 'text/csv');
+    res.setHeader('Content-Disposition', 'attachment; filename=organization_achievement_report.csv');
+    
+    return res.status(200).send(csvContent);
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Failed to generate export file', error: err.message });
   }
 };

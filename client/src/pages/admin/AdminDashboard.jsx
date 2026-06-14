@@ -18,9 +18,28 @@ const AdminDashboard = () => {
     fetchStats();
   }, []);
 
+  const handleExport = () => {
+    try {
+      const token = localStorage.getItem('token');
+      // Triggers browser download directly with auth pass-through via window opening
+      window.open(`http://localhost:5000/api/goals/export-report?token=${token}`, '_blank');
+    } catch (err) {
+      alert('Failed to generate export file. Please check server logs.');
+    }
+  };
+
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold mb-8">Organization Performance Overview</h1>
+      {/* Refactored Header to match corporate layout requirements with action items */}
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-2xl font-bold">Organization Performance Overview</h1>
+        <button 
+          onClick={handleExport}
+          className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-4 py-2 rounded shadow transition flex items-center space-x-2"
+        >
+          <span>📥 Export CSV Report</span>
+        </button>
+      </div>
       
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div className="bg-white p-6 rounded shadow">
