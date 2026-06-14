@@ -21,6 +21,11 @@ export const createGoal = async (req, res) => {
   
   if (!activeCycle) throw new CustomError('No active cycle found', 404);
 
+  // BRD Enforced Rule: Min 10% weightage per goal
+  if (weightage < 10) {
+    throw new CustomError('Validation failed: Minimum weightage per individual goal is 10%', 400);
+  }
+
   const count = await Goal.countDocuments({ employeeId: req.user._id, cycleId: activeCycle._id });
   if (count >= 8) throw new CustomError('Limit reached: Max 8 goals allowed', 400);
 
@@ -32,6 +37,9 @@ export const createGoal = async (req, res) => {
 
   res.status(201).json({ success: true, data: goal });
 };
+
+
+
 
 export const getMyGoals = async (req, res) => {
   const goals = await Goal.find({ employeeId: req.user._id });
@@ -55,12 +63,14 @@ export const submitGoalSheet = async (req, res) => {
 };
 
 export const approveGoal = async (req, res) => {
+  const { comment } = req.body; // Capture the check-in documentation note
   const goal = await Goal.findById(req.params.id);
   if (!goal) throw new CustomError('Goal not found', 404);
 
   const oldState = await Goal.findById(req.params.id);
   
   goal.status = 'approved';
+  goal.managerComment = comment || 'Approved by manager';
   goal.lockedAt = new Date();
   await goal.save();
 
@@ -69,16 +79,20 @@ export const approveGoal = async (req, res) => {
 };
 
 export const returnGoal = async (req, res) => {
+  const { comment } = req.body;
+  if (!comment) throw new CustomError('A feedback comment is required to return goals for rework', 400);
+
   const goal = await Goal.findById(req.params.id);
   if (!goal) throw new CustomError('Goal not found', 404);
 
   const oldState = await Goal.findById(req.params.id);
   goal.status = 'returned';
+  goal.managerComment = comment;
   goal.lockedAt = null;
   await goal.save();
 
   await logAudit(goal._id, req.user, 'RETURN', oldState, goal);
-  res.status(200).json({ success: true, message: 'Goal returned for rework' });
+  res.status(200).json({ success: true, message: 'Goal returned for rework successfully' });
 };
 
 export const getTeamGoals = async (req, res) => {
